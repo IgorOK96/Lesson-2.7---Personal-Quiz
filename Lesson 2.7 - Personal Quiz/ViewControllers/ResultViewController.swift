@@ -7,23 +7,44 @@
 
 import UIKit
 
-class ResultViewController: UIViewController {
+final class ResultViewController: UIViewController {
 
+    var questions: [Question]!
+    var answersChosen: [Answer]!
+    
+    @IBOutlet var resultLabel: UILabel!
+    @IBOutlet var animalDefinition: UILabel!
+    private var definitionAnimal: (character: Character, description: String)!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.hidesBackButton = true
 
-        // Do any additional setup after loading the view.
+        definitionAnimal = typeDefinition(from: answersChosen)
+        animalDefinition.numberOfLines = 0
+        animalDefinition.sizeToFit()
+        resultLabel.text = "Вы - \(definitionAnimal.character)"
+        animalDefinition.text = definitionAnimal.description
+        animalDefinition.lineBreakMode = .byWordWrapping
+
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    @IBAction func doneButtonAction(_ sender: UIBarButtonItem) {
+        dismiss(animated: true)
     }
-    */
-
 }
+
+private extension ResultViewController {
+    private func typeDefinition(from answersChosen: [Answer]) -> (character: Character, description: String) {
+        var animalCount: [Animal: Int] = [:]
+        
+        for answer in answersChosen {
+            let animal = answer.animal
+            animalCount[animal, default: 0] += 1
+        }
+        
+        let mostCommonAnimal = animalCount.max { a, b in
+            a.value < b.value
+        }?.key
+        
+        return (mostCommonAnimal?.rawValue ?? "❓", mostCommonAnimal?.definition ?? "Описание не найдено")
+    }}
